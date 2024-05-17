@@ -48,13 +48,13 @@ def check_input():
 
 
 def calculate_spindle_speed(diameter, material):
-    spindle_speed = material_dict[material] * diameter
+    spindle_speed = (material_dict[material]*1000)/(PI*diameter)
     print(f"SPINDLE SPEED:{spindle_speed}RPM")
     return spindle_speed
 
 
-def calculate_cutting_speed(material):
-    cutting_speed = CUTTING_SPEED_FACTOR * material_dict[material]
+def calculate_cutting_speed(diameter, spindle_speed):
+    cutting_speed = (PI * diameter * spindle_speed)/1000
     print(F"CUTTING SPEED: {cutting_speed}m/min")
     return cutting_speed
 
@@ -64,19 +64,51 @@ def calculate_feed_rate(cutting_speed, teeth, diameter):
     print(f"FEED RATE: {feed_rate}mm/min")
     return feed_rate
 
-material, diameter, teeth = check_input()
-spindle_speed = calculate_spindle_speed(diameter, material)
-cutting_speed = calculate_cutting_speed(material)
-feed_rate = calculate_feed_rate(cutting_speed, teeth, diameter)
 
-# Set display max columns for pandas DataFrame
-pd.set_option('display.max_columns', None)
+def main():
+    material, diameter, teeth = check_input()
+    spindle_speed = calculate_spindle_speed(diameter, material)
+    cutting_speed = calculate_cutting_speed(diameter, spindle_speed)
+    feed_rate = calculate_feed_rate(cutting_speed, teeth, diameter)
 
-df = pd.DataFrame({
-    'Spindle speed(RPM)': [spindle_speed],
-    'Cutting speed(m/min)': [cutting_speed],
-    'Feed rate(mm/min)': [feed_rate]
-})
+    df = pd.DataFrame({
+        'Spindle speed(RPM)': [spindle_speed],
+        'Cutting speed(m/min)': [cutting_speed],
+        'Feed rate(mm/min)': [feed_rate]
+    })
+    df.index = range(1, len(df) + 1)
 
-# Append the DataFrame to the existing CSV file
-df.to_csv('CNC.csv', mode='a', header=False, index=False)
+    try:
+        cnc_data = pd.read_csv("CNC.csv")
+        data_index = len(cnc_data) + 1
+    except FileNotFoundError:
+        print("\nERROR: FileNotFoundError\nCNC data file does not exist. Creating new CNC data file")
+        df.to_csv("CNC.csv", mode="w", header=True, index_label="Index")
+        data_index = 1
+        df.index = [data_index]
+    except pd.errors.EmptyDataError:
+        print("CNC data file is empty. Initializing with index 1.")
+        data_index = 1
+        df.index = [data_index]
+        df.to_csv("CNC.csv", mode="a", header=False, index_label="Index")
+    else:
+        df.index = [data_index]
+        df.to_csv("CNC.csv", mode="a", header=False, index_label="Index")
+    print(df)
+
+
+still_have_inputs = True
+while still_have_inputs:
+    main()
+    more_inputs = input("\nDo you still have more inputs?[Y/N]").lower()
+    while more_inputs != "n" and more_inputs != "y":
+        print("Enter Y or N")
+        more_inputs = input("\nDo you still have more inputs?[Y/N]\n").lower()
+    if more_inputs == "n":
+        print("---------------------Program shutting down---------------------")
+        still_have_inputs = False
+    elif more_inputs == "y":
+        continue
+
+
+
