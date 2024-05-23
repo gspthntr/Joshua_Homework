@@ -21,40 +21,43 @@ def check_input():
             print(f"CHOSEN MATERIAL: {chosen_material}\n")
             break
         else:
-            print("Enter a valid material nigga\n")
+            print("Enter a valid material.\n")
 
     while True:
         try:
             num_teeth = int(input("What is the number of teeth on your cutting tool?"))
             is_int = isinstance(num_teeth, int)
-            if is_int:
+            if is_int and num_teeth > 0:
                 print(f"NUMBER OF TEETH: {num_teeth} teeth\n")
                 break
+            if num_teeth <= 0:
+                print("Number of teeth cannot be less than or equal to 0. Enter a valid integer\n")
         except ValueError:
-            print("Enter a valid integer nigga\n")
+            print("Enter a valid integer.\n")
 
     while True:
         try:
             diameter_cutting_tool = float(input("What is the diameter of your cutting tool"))
             is_int = isinstance(diameter_cutting_tool, float)
-            if is_int:
+            if is_int and diameter_cutting_tool > 0:
                 print(f"DIAMETER: {diameter_cutting_tool}mm\n")
                 break
+            if diameter_cutting_tool <= 0:
+                print("Diameter cannot be less than or equal to 0. Enter a valid integer\n")
         except ValueError:
-            print("Enter a valid diameter nigga\n")
-
+            print("Enter a valid diameter.\n")
     print(f"You material is {chosen_material}, number of teeth is {num_teeth}, diameter is {diameter_cutting_tool}mm")
     return chosen_material, diameter_cutting_tool, num_teeth
 
 
 def calculate_spindle_speed(diameter, material):
-    spindle_speed = (material_dict[material]*1000)/(PI*diameter)
+    spindle_speed = material_dict[material] * diameter
     print(f"SPINDLE SPEED:{spindle_speed}RPM")
     return spindle_speed
 
 
-def calculate_cutting_speed(diameter, spindle_speed):
-    cutting_speed = (PI * diameter * spindle_speed)/1000
+def calculate_cutting_speed(material):
+    cutting_speed = CUTTING_SPEED_FACTOR * material_dict[material]
     print(F"CUTTING SPEED: {cutting_speed}m/min")
     return cutting_speed
 
@@ -68,7 +71,7 @@ def calculate_feed_rate(cutting_speed, teeth, diameter):
 def main():
     material, diameter, teeth = check_input()
     spindle_speed = calculate_spindle_speed(diameter, material)
-    cutting_speed = calculate_cutting_speed(diameter, spindle_speed)
+    cutting_speed = calculate_cutting_speed(material)
     feed_rate = calculate_feed_rate(cutting_speed, teeth, diameter)
 
     df = pd.DataFrame({
