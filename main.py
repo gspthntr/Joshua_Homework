@@ -50,8 +50,8 @@ def check_input():
     return chosen_material, diameter_cutting_tool, num_teeth
 
 
-def calculate_spindle_speed(diameter, material):
-    spindle_speed = material_dict[material] * diameter
+def calculate_spindle_speed(diameter):
+    spindle_speed = SPINDLE_SPEED_FACTOR * diameter
     print(f"SPINDLE SPEED:{spindle_speed}RPM")
     return spindle_speed
 
@@ -70,7 +70,7 @@ def calculate_feed_rate(cutting_speed, teeth, diameter):
 
 def main():
     material, diameter, teeth = check_input()
-    spindle_speed = calculate_spindle_speed(diameter, material)
+    spindle_speed = calculate_spindle_speed(diameter)
     cutting_speed = calculate_cutting_speed(material)
     feed_rate = calculate_feed_rate(cutting_speed, teeth, diameter)
 
