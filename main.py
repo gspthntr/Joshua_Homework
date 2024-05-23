@@ -38,8 +38,8 @@ def check_input():
     while True:
         try:
             diameter_cutting_tool = float(input("What is the diameter of your cutting tool"))
-            is_int = isinstance(diameter_cutting_tool, float)
-            if is_int and diameter_cutting_tool > 0:
+            is_float = isinstance(diameter_cutting_tool, float)
+            if is_float and diameter_cutting_tool > 0:
                 print(f"DIAMETER: {diameter_cutting_tool}mm\n")
                 break
             if diameter_cutting_tool <= 0:
@@ -51,19 +51,21 @@ def check_input():
 
 
 def calculate_spindle_speed(diameter):
-    spindle_speed = SPINDLE_SPEED_FACTOR * diameter
+    spindle_speed = round((SPINDLE_SPEED_FACTOR * diameter), 5)
     print(f"SPINDLE SPEED:{spindle_speed}RPM")
     return spindle_speed
 
 
 def calculate_cutting_speed(material):
-    cutting_speed = CUTTING_SPEED_FACTOR * material_dict[material]
+    cutting_speed = round((CUTTING_SPEED_FACTOR * material_dict[material]), 5)
     print(F"CUTTING SPEED: {cutting_speed}m/min")
     return cutting_speed
 
 
 def calculate_feed_rate(cutting_speed, teeth, diameter):
-    feed_rate = cutting_speed * teeth * diameter
+    teeth = teeth
+    diameter = diameter
+    feed_rate = round((cutting_speed * teeth * diameter), 5)
     print(f"FEED RATE: {feed_rate}mm/min")
     return feed_rate
 
